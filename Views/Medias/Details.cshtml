@@ -1,0 +1,66 @@
+@model Models.Media
+@{
+    ViewBag.PageTitle = "Détails";
+    string search = Session["Search"] != null ? ((bool)Session["Search"]).ToString() : false.ToString();
+    string SearchString = Session["SearchString"] != null ? (string)Session["SearchString"] : "";
+}
+
+<div id="detailsPanel" class="detailsPanel">
+    @Html.Action("GetMediaDetails", new { forceRefresh = true })
+</div>
+
+@section Scripts {
+    <script>
+        let mediaDetails_ARP = null;
+
+        $(() => {
+            newSession(600);
+            setCurrentPageLimit();
+
+            mediaDetails_ARP = new AutoRefreshedPanel(
+                "detailsPanel",
+                "/Medias/GetMediaDetails",
+                5,
+                mediaDetailsPostRefresh
+            );
+
+            sessionStorage.setItem("RestoreScrollPosition", "1");
+
+            bindDetailsCommands();
+        });
+
+        function mediaDetailsPostRefresh() {
+            highlightKeyword();
+            bindDetailsCommands();
+        }
+
+        function bindDetailsCommands() {
+            $(".toggleLikeCmd").off("click").on("click", function (e) {
+                e.preventDefault();
+                $.ajax({
+                    url: "/Medias/ToggleCurrentMediaLike",
+                    success: function () {
+                        if (mediaDetails_ARP) mediaDetails_ARP.refresh(true);
+                    }
+                });
+            });
+        }
+
+        function highlightKeyword() {
+            if ("@search" == "True") {
+                let keyword = "@SearchString";
+                if (keyword.length > 0) {
+                    let titles = document.getElementsByClassName('mediaTitle');
+                    Array.from(titles).forEach(title => {
+                        highlight(keyword, title);
+                    });
+
+                    let descriptions = document.getElementsByClassName('mediaDescription');
+                    Array.from(descriptions).forEach(description => {
+                        highlight(keyword, description);
+                    });
+                }
+            }
+        }
+    </script>
+}

@@ -1,0 +1,13 @@
+@{
+    var owners = DAL.DB.Medias.MediaOwners();
+    int selectedOwnerId = Session["SelectedOwnerId"] != null ? (int)Session["SelectedOwnerId"] : 0;
+}
+
+<select id="ownerSelect" class="form-control">
+    <option value="0">Tous les usagers</option>
+    @foreach (var owner in owners)
+    {
+        string selected = selectedOwnerId == owner.Id ? "selected" : "";
+        <option value="@owner.Id" @selected>@owner.Name</option>
+    }
+</select>

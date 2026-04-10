@@ -1,0 +1,57 @@
+@model Models.Media
+
+@if (Model != null)
+{
+    int connectedId = Models.User.ConnectedUser.Id;
+    bool isVisible = Model.Shared || Models.User.ConnectedUser.IsAdmin || Model.OwnerId == connectedId;
+
+    if (isVisible)
+    {
+        bool likedByConnectedUser = Model.IsLikedBy(connectedId);
+        string likedByTooltip = Model.LikesCount > 0
+            ? string.Join(", ", Model.LikedByUsers.Select(u => u.Name))
+            : "Aucun j’aime";
+
+        <dl>
+            <dd style="display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap;">
+                <div>
+                    @if ((Models.User.ConnectedUser.Id == Model.OwnerId || Models.User.ConnectedUser.IsAdmin) && Model.Shared)
+                    {
+                        <span style="color:grey">[Partagé]</span>
+                    }
+                </div>
+                <div class="mediaLikePanel" style="display:flex; align-items:center; gap:12px; padding:8px 12px; border:1px solid #ddd; border-radius:12px; background-color:#fafafa;">
+                    <span title="@likedByTooltip"><i class="fa-regular fa-heart"></i> @Model.LikesCount j’aime</span>
+                    <a href="#" class="toggleLikeCmd" mediaId="@Model.Id" title="@(likedByConnectedUser ? "Retirer j’aime" : "Ajouter j’aime")" style="color:inherit; text-decoration:none; font-size:1.2em;">
+                        <i class="fa@(likedByConnectedUser ? "-solid" : "-regular") fa-heart"></i>
+                    </a>
+                </div>
+            </dd>
+            <dd class="mediaTitle">
+                @Model.Title
+            </dd>
+            <dd>
+                @Helper.YoutubePlayer(Model.YoutubeId)
+            </dd>
+            <dd class="mediaDescription description">
+                @Model.Description
+            </dd>
+            <dt>Catégorie</dt>
+            <dd>@Model.Category</dd>
+            <dt>Date de publication</dt>
+            <dd>@Helper.When(Model.PublishDate)</dd>
+            <dt>Ajouté par</dt>
+            <dd class="owner" ownerid="@Model.OwnerId">
+                @Helper.AvatarUser(Model.Owner)
+            </dd>
+        </dl>
+    }
+    else
+    {
+        <h2 style="color:red">Cette vidéo n'est plus partagée...</h2>
+    }
+}
+else
+{
+    <h2 style="color:red">Cette vidéo a été effacée...</h2>
+}
