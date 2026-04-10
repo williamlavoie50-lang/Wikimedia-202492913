@@ -379,6 +379,7 @@ public class MediasController : Controller
             Media.Id = id;
             Media.OwnerId = storedMedia.OwnerId;
             Media.PublishDate = storedMedia.PublishDate;
+            //garde like en memoire
             Media.LikedByUserIds = storedMedia.LikedByUserIds ?? new List<int>();
 
             if (Media.IsValid())

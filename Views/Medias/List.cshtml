@@ -92,10 +92,17 @@
                 if (fromRefresh) {
                     categoriesSelectAutoRefreshPanel.refresh(true);
                     ownersSelectAutoRefreshPanel.refresh(true);
-                    $(".toggleLikeCmd").off();
-                    $(".toggleLikeCmd").click(function (e) {
-                        mediasListAutoRefreshPanel.command("/Medias/ToggleMediaLike/" + $(this).attr("mediaId"));
+                    $(".toggleLikeCmd").off("click").on("click", function (e) {
                         e.preventDefault();
+
+                        let mediaId = $(this).attr("mediaId");
+
+                        $.ajax({
+                            url: "/Medias/ToggleMediaLike/" + mediaId,
+                            success: function () {
+                                mediasListAutoRefreshPanel.refresh(true);
+                            }
+                        });
                     });
                 }
                 $(".mediaThumbnail").off();
